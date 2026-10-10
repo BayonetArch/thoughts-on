@@ -1,16 +1,14 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-
-type commmentObject = {
-  id: string;
-  name: string;
-  comment: string;
-};
+// const severUrl = "http://localhost:5000";
 
 export default function AddComment() {
   const [name, setName] = useState<string>("");
   const [comment, setComment] = useState<string>("");
+
+  const router = useRouter();
 
   async function submit() {
     if (name === "" || comment === "") return;
@@ -19,7 +17,7 @@ export default function AddComment() {
 
     let res;
     try {
-      res = await fetch("http://localhost:5000/api/comment", {
+      res = await fetch("/api/comment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: id, name: name, comment: comment }),
@@ -34,6 +32,9 @@ export default function AddComment() {
       return;
     }
 
+    setName("");
+    setComment("");
+    if (data.ok) router.refresh();
     console.log(data);
   }
 
