@@ -1,0 +1,5 @@
+{
+  "name": "thoughts-on",
+  "private": true,
+  "workspaces": ["frontend","backend"]
+}
