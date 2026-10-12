@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import AddComment from "./components/AddComment";
 import CommentList from "./components/CommentList";
 
-const postURL = "/api/comment";
+// const postURL = "/api/comment";
 
 export default async function Home() {
   return (

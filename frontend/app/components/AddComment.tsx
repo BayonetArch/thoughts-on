@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-// const severUrl = "http://localhost:5000";
 
 export default function AddComment() {
   const [name, setName] = useState<string>("");
@@ -39,9 +38,10 @@ export default function AddComment() {
   }
 
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div className="mt-14 flex flex-col items-center gap-2">
+      <p className="font-bold  text-3xl">Add a Comment</p>
       <form
-        className="flex flex-col items-center gap-2 mt-4"
+        className="flex flex-col items-center gap-4 mt-4"
         onSubmit={(e) => {
           e.preventDefault();
           submit();
