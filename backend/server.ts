@@ -1,30 +1,22 @@
-import express, {} from "express";
+import commentRouter from "./routes/commentRoutes";
 import corsMiddleware from "./middleware/cors";
-import commentRouter from "./routes/comment";
 import errorHandler from "./middleware/errorHandler";
-import { stdin } from "node:process";
-import fs from "node:fs";
-stdin.setEncoding("utf-8");
+import express, {} from "express";
+import { Pool } from "pg";
 
 const app = express();
 const PORT = 5000;
 
-if (!fs.existsSync("./data/comments.json")) {
-  console.log("database doesnot exist, creating now...");
-  !fs.existsSync("./data") && fs.mkdirSync("./data");
-
-  fs.writeFileSync("./data/comments.json", "{}");
-}
+const pool: Pool = new Pool({ connectionString: process.env.DATABASE_URL });
+await pool.query(
+  "CREATE TABLE IF NOT EXISTS comments (id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, name TEXT NOT NULL, comment TEXT NOT NULL)",
+);
 
 app.use(corsMiddleware);
 
 app.use(express.json());
 
-app.use("/api/comment", commentRouter);
-
-app.get("/", (_req, res) => {
-  res.send("Hello, World!");
-});
+app.use("/api/comments", commentRouter);
 
 app.use(errorHandler);
 
@@ -32,8 +24,4 @@ app.listen(PORT, () => {
   console.log("Server running on http://localhost:" + PORT);
 });
 
-stdin.on("data", (data) => {
-  if (data === "clear\n" || data === "c\n") {
-    console.clear();
-  }
-});
+export default pool;
