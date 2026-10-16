@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import pool from "../server.ts";
+import pool from "../db.ts";
 
 export async function getComments(req: Request, res: Response) {
   let result;
