@@ -8,7 +8,7 @@ export default function DeleteComment({ id }: { id: string }) {
   async function deleteComment() {
     let res;
     try {
-      res = await fetch(`/api/comment/${id}`, {
+      res = await fetch(`/api/comments/${id}`, {
         method: "DELETE",
       });
     } catch (e) {

@@ -8,8 +8,8 @@ import CommentList from "./components/CommentList";
 
 export default async function Home() {
   return (
-    <div className="text-center p-20 bold text-2xl">
-      <Suspense fallback={<p>Loading Comments...</p>}>
+    <div className="text-center p-4 bold md:p-14 md:text-2xl text-lg">
+      <Suspense fallback={<p>Loading Thoughts...</p>}>
         <CommentList />
       </Suspense>
       <AddComment />

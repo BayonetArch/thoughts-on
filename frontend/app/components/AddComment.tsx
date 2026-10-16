@@ -12,14 +12,12 @@ export default function AddComment() {
   async function submit() {
     if (name === "" || comment === "") return;
 
-    const id = crypto.randomUUID();
-
     let res;
     try {
-      res = await fetch("/api/comment", {
+      res = await fetch("/api/comments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: id, name: name, comment: comment }),
+        body: JSON.stringify({ name: name, comment: comment }),
       });
     } catch (e) {
       console.log("could not post", e);
@@ -39,7 +37,7 @@ export default function AddComment() {
 
   return (
     <div className="mt-14 flex flex-col items-center gap-2">
-      <p className="font-bold  text-3xl">Add a Comment</p>
+      <p className="font-bold  text-3xl">thoughts ?...</p>
       <form
         className="flex flex-col items-center gap-4 mt-4"
         onSubmit={(e) => {
@@ -56,13 +54,13 @@ export default function AddComment() {
         />
         <input
           type="text"
-          placeholder="Comment"
+          placeholder="your thoughts.."
           className="border border-gray-300 p-2 rounded-md"
           value={comment}
           onChange={(e) => setComment(e.target.value)}
         />
-        <button className="bg-blue-500 text-white p-2 rounded-md">
-          Submit
+        <button className="bg-sky-500/40 text-white p-2 rounded-md">
+          Add your thoughts
         </button>
       </form>
     </div>
