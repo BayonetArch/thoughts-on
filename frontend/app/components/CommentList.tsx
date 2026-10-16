@@ -48,7 +48,9 @@ function Comments({
 }
 
 export default async function CommentList() {
-  const res = await fetchData("/api/comments", {
+  const base =
+    process.env.NEXT_PUBLIC_API_URL ?? "https://thoughts-on.vercel.app";
+  const res = await fetchData(`${base}/api/comments`, {
     cache: "no-store",
   });
   const commentJSON: commentObject[] | undefined = res?.data;
