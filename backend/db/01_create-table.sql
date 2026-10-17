@@ -1,0 +1,7 @@
+ CREATE TABLE IF NOT EXISTS 
+    comments (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name TEXT NOT NULL,
+    comment TEXT NOT NULL
+  ),
+

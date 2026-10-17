@@ -34,10 +34,10 @@ function Comments({
   return (
     <div className="flex flex-col gap-4  rounded-xl p-6  relative bg-mauve-900 justify-center">
       <p className="flex gap-2 bold text-xl md:text-2xl items-center text-gray-400 min-w-0">
-        <User className="shrink-0 stroke-green-200" />
+        <User className="shrink-0 stroke-green-200 " />
         <span className="min-w-0 wrap-break-word">{name}</span>
       </p>
-      <p className="flex gap-2 bold text-xl text-gray-800 min-w-0">
+      <p className="flex gap-2 bold text-xl text-gray-800 min-w-0 ">
         <span className="shrink-0">{">>"}</span>{" "}
         <span className="italic text-lg text-[white]/65 min-w-0 wrap-break-word">
           {comment}

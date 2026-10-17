@@ -2,15 +2,11 @@ import commentRouter from "./routes/commentRoutes";
 import corsMiddleware from "./middleware/cors";
 import errorHandler from "./middleware/errorHandler";
 import express, {} from "express";
-import { Pool } from "pg";
 
 const app = express();
 const PORT = process.env.PORT ?? 5000;
 
-const pool: Pool = new Pool({ connectionString: process.env.DATABASE_URL });
-await pool.query(
-  "CREATE TABLE IF NOT EXISTS comments (id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, name TEXT NOT NULL, comment TEXT NOT NULL)",
-);
+console.log(process.env.DATABASE_URL);
 
 app.use(corsMiddleware);
 

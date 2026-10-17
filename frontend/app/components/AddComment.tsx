@@ -11,10 +11,12 @@ export default function AddComment() {
 
   async function submit() {
     if (name === "" || comment === "") return;
+    const base =
+      process.env.NODE_ENV === "production" ? "" : "http://localhost:5000";
 
     let res;
     try {
-      res = await fetch("/api/comments", {
+      res = await fetch(`${base}/api/comments`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: name, comment: comment }),
