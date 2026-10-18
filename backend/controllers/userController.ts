@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import pool from "../lib/db";
 import logger from "../lib/logger";
 import PG from "pg";
+import { createSession } from "../services/sessions";
 
 export function getCurrentUser(_req: Request, res: Response) {
   res.json({ ok: true, data: "Working on it.. (getCurrentUser)" });
@@ -79,6 +80,15 @@ export async function loginUser(req: Request, res: Response) {
       error: "Invalid username or password",
     });
   }
+  const { token, expiresAt } = await createSession(user.id);
+
+  res.cookie("session", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    expires: expiresAt,
+  });
+
   logger.debug("user logged in: ", username, "with id:", user.id);
   res.json({ ok: true, loggedIn: { username, id: user.id } });
 }
