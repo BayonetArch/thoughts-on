@@ -7,11 +7,12 @@ import {
 } from "../controllers/userController";
 import validateBody from "../middleware/validateBody";
 import userSchema from "../schemas/userSchema";
+import requireAuth from "../middleware/requireAuth";
 
 const authRouter = Router();
 
 /* GET /api/auth/me */
-authRouter.get("/me", getCurrentUser);
+authRouter.get("/me",requireAuth, getCurrentUser);
 
 /* POST /api/auth/register */
 authRouter.post(

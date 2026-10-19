@@ -3,23 +3,23 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function AddComment() {
+export default function AddThought() {
   const [name, setName] = useState<string>("");
-  const [comment, setComment] = useState<string>("");
+  const [thought, setThought] = useState<string>("");
 
   const router = useRouter();
 
   async function submit() {
-    if (name === "" || comment === "") return;
+    if (name === "" || thought === "") return;
     const base =
       process.env.NODE_ENV === "production" ? "" : "http://localhost:5000";
 
     let res;
     try {
-      res = await fetch(`${base}/api/comments`, {
+      res = await fetch(`${base}/api/thoughts`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name, comment: comment }),
+        body: JSON.stringify({ name: name, thought: thought }),
       });
     } catch (e) {
       console.log("could not post", e);
@@ -32,7 +32,7 @@ export default function AddComment() {
     }
 
     setName("");
-    setComment("");
+    setThought("");
     if (data.ok) router.refresh();
     console.log(data);
   }
@@ -49,17 +49,10 @@ export default function AddComment() {
       >
         <input
           type="text"
-          placeholder="Name"
-          className="border border-gray-300 p-2 rounded-md"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <input
-          type="text"
           placeholder="your thoughts.."
           className="border border-gray-300 p-2 rounded-md"
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
+          value={thought}
+          onChange={(e) => setThought(e.target.value)}
         />
         <button className="bg-sky-500/40 text-white p-2 rounded-md">
           Add your thoughts

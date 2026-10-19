@@ -2,10 +2,10 @@ import type { Request, Response } from "express";
 import pool from "../lib/db";
 import logger from "../lib/logger";
 import PG from "pg";
-import { createSession } from "../services/sessions";
+import { createSession, deleteSession } from "../services/sessions";
 
 export function getCurrentUser(_req: Request, res: Response) {
-  res.json({ ok: true, data: "Working on it.. (getCurrentUser)" });
+  res.json({ ok: true, user: res.locals.user });
 }
 
 export async function registerUser(req: Request, res: Response) {
@@ -48,9 +48,7 @@ export async function registerUser(req: Request, res: Response) {
   const user = result.rows[0];
 
   logger.info("Registered user: ", username, "with id:", user.id);
-  res
-    .status(201)
-    .json({ ok: true, registered: { username: username, id: user.id } });
+  res.status(201).json({ ok: true, user: { username: username, id: user.id } });
 }
 
 export async function loginUser(req: Request, res: Response) {
@@ -94,5 +92,9 @@ export async function loginUser(req: Request, res: Response) {
 }
 
 export function logoutUser(req: Request, res: Response) {
-  res.json({ ok: true, data: "Working on it.. (logoutUser)" });
+  const token = req.cookies.session;
+  if (token) deleteSession(token);
+
+  res.clearCookie("session");
+  res.json({ ok: true });
 }
