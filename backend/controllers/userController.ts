@@ -3,6 +3,7 @@ import pool from "../lib/db";
 import logger from "../lib/logger";
 import PG from "pg";
 import { createSession, deleteSession } from "../services/sessions";
+import assert from "node:assert";
 
 export function getCurrentUser(_req: Request, res: Response) {
   res.json({ ok: true, user: res.locals.user });
@@ -52,7 +53,11 @@ export async function registerUser(req: Request, res: Response) {
 }
 
 export async function loginUser(req: Request, res: Response) {
-  const { username, pass } = req.body;
+  const { username, password } = req.body;
+  assert(
+    username && password,
+    "username and password required but not undefined. This is not a expected behaviour",
+  );
   let result;
   try {
     result = await pool.query("SELECT * FROM users WHERE username = $1", [
@@ -71,7 +76,7 @@ export async function loginUser(req: Request, res: Response) {
     });
   }
 
-  const ok = Bun.password.verify(pass, user.password_hash);
+  const ok = Bun.password.verify(password, user.password_hash);
   if (!ok) {
     return res.status(401).json({
       ok: false,
@@ -88,7 +93,7 @@ export async function loginUser(req: Request, res: Response) {
   });
 
   logger.debug("user logged in: ", username, "with id:", user.id);
-  res.json({ ok: true, loggedIn: { username, id: user.id } });
+  res.json({ ok: true, user: { username, id: user.id } });
 }
 
 export function logoutUser(req: Request, res: Response) {

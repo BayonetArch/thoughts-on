@@ -12,7 +12,7 @@ import requireAuth from "../middleware/requireAuth";
 const authRouter = Router();
 
 /* GET /api/auth/me */
-authRouter.get("/me",requireAuth, getCurrentUser);
+authRouter.get("/me", requireAuth, getCurrentUser);
 
 /* POST /api/auth/register */
 authRouter.post(

@@ -1,11 +1,16 @@
 "use client";
 import { useState } from "react";
-import { fetchData } from "../components/ThoughtsList";
+import { useAuth } from "../AuthContext";
 
 export default function Login() {
+  const { user, loading, login } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [msg, setMessage] = useState("");
+
+  if (!loading && user !== null) {
+    return <div>Already logged in as {user.username}</div>;
+  }
 
   async function loginUser() {
     if (password === "" || username === "") {
@@ -13,20 +18,15 @@ export default function Login() {
       return;
     }
 
-    const res = await fetchData(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: username, password: password }),
-      },
-    );
-    if (!res.ok) {
-      console.error(res.error);
-      setMessage(`error: ${res.error}`);
-      return;
+    try {
+      await login(username, password);
+      setMessage("Logged In");
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Something went wrong";
+      console.error(errorMessage);
+      setMessage(`error: ${errorMessage}`);
     }
-    setMessage("Logged In");
   }
 
   return (
