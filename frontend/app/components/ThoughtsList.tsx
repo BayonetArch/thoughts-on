@@ -1,5 +1,6 @@
 import { User } from "lucide-react";
 
+
 type thoughtObject = {
   id: string;
   name: string;
