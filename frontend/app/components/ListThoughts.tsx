@@ -1,9 +1,10 @@
+"use client";
 import { User } from "lucide-react";
-
+import { useEffect, useState } from "react";
 
 type thoughtObject = {
   id: string;
-  name: string;
+  user_id: string;
   thought: string;
 };
 
@@ -24,11 +25,9 @@ export async function fetchData(url: string, opts?: RequestInit) {
 }
 
 function Thoughts({
-  id,
   name: userName,
   thought,
 }: {
-  id: string;
   name: string;
   thought: string;
 }) {
@@ -48,31 +47,42 @@ function Thoughts({
   );
 }
 
-export default async function ThoughtList() {
-  const base =
-    process.env.NEXT_PUBLIC_API_URL ?? "https://thoughts-on.vercel.app";
-  const res = await fetchData(`${base}/api/thoughts`, {
-    cache: "no-store",
-  });
+export default function ListThoughts() {
+  const [thoughts, setThoughts] = useState<thoughtObject[] | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrMsg] = useState<string | null>(null);
+  useEffect(() => {
+    async function loadThoughts() {
+      const base =
+        process.env.NEXT_PUBLIC_API_URL ?? "https://thoughts-on.vercel.app";
+      const res = await fetchData(`${base}/api/thoughts`, {
+        cache: "no-store",
+      });
+      setLoading(false);
+      if (res?.error) {
+        setErrMsg(res.error);
+        return;
+      }
+      setThoughts(res?.thoughts);
+    }
+    loadThoughts();
+  }, []);
 
-  if (!res.ok) {
-    return <p>Internal server error while getting thoughts: {res.error}</p>;
+  if (!loading && thoughts === null) {
+    return <p>Internal server error while getting thoughts: {errorMsg}</p>;
   }
 
-  const thoughtJSON: thoughtObject[] | undefined = res?.data;
+  if (loading || thoughts === null) {
+    return <p>Loading...</p>;
+  }
 
   return (
     <div className="flex flex-col gap-4 md:gap-6">
-      {!thoughtJSON || thoughtJSON.length === 0 ? (
+      {!thoughts || thoughts.length === 0 ? (
         <div>thoughts not found.</div>
       ) : (
-        thoughtJSON.map((obj) => (
-          <Thoughts
-            key={obj.id}
-            id={obj.id}
-            name={obj.name}
-            thought={obj.thought}
-          />
+        thoughts.map((obj) => (
+          <Thoughts key={obj.id} name={obj.user_id} thought={obj.thought} />
         ))
       )}
     </div>

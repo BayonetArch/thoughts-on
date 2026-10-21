@@ -12,7 +12,7 @@ export async function getThoughts(req: Request, res: Response) {
     return;
   }
   logger.info("SENT: ", result.rows);
-  res.json({ ok: true, data: result.rows });
+  res.json({ ok: true, thoughts: result.rows });
 }
 
 export async function getThoughtsByID(req: Request, res: Response) {
@@ -32,7 +32,7 @@ export async function getThoughtsByID(req: Request, res: Response) {
     return;
   }
   logger.info(`Got thought for id '${id}'`, result.rows[0]);
-  res.json({ ok: true, data: result.rows });
+  res.json({ ok: true, thought: result.rows });
 }
 
 export async function createThoughts(req: Request, res: Response) {
@@ -40,8 +40,8 @@ export async function createThoughts(req: Request, res: Response) {
   let result;
   try {
     result = await pool.query(
-      "INSERT INTO thoughts (name, thought) VALUES ($1, $2) RETURNING *",
-      [body.name, body.thought],
+      "INSERT INTO thoughts (user_id,thought) VALUES ($1,$2) RETURNING *",
+      [body.user_id, body.thought],
     );
   } catch (e) {
     logger.info("Got error while creating thought\n", e);
@@ -49,7 +49,7 @@ export async function createThoughts(req: Request, res: Response) {
   }
 
   logger.info("Created thought", result.rows[0]);
-  res.json({ ok: true, created: result.rows[0] });
+  res.json({ ok: true, created: { thought: result.rows[0] } });
 }
 
 // export function updatethoughts(req: Request, res: Response) {}

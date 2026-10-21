@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useAuth } from "../AuthContext";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function ProtectedLayout({
   children,
@@ -11,11 +11,12 @@ export default function ProtectedLayout({
 }) {
   const router = useRouter();
   const { user, loading } = useAuth();
+  const pathname = usePathname();
   useEffect(() => {
     if (!loading && user === null) {
-      router.replace("/login");
+      router.replace(`/login?next=${encodeURIComponent(pathname)}`);
     }
-  }, [loading, user, router]);
+  }, [loading, user, router, pathname]);
 
   if (loading || user === null) {
     return <p>Loading...</p>;

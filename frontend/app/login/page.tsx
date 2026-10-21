@@ -1,12 +1,16 @@
 "use client";
 import { useState } from "react";
 import { useAuth } from "../AuthContext";
+import { useSearchParams, useRouter } from "next/navigation";
+import { getSafeRedirectPath } from "@/lib/redirect";
 
 export default function Login() {
   const { user, loading, login } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [msg, setMessage] = useState("");
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
   if (!loading && user !== null) {
     return <div>Already logged in as {user.username}</div>;
@@ -21,6 +25,9 @@ export default function Login() {
     try {
       await login(username, password);
       setMessage("Logged In");
+      // make sure we are not immune against the url redirect attacks to malicious urls
+      const safeRedirectPath = getSafeRedirectPath(searchParams.get("next"));
+      router.push(safeRedirectPath);
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Something went wrong";

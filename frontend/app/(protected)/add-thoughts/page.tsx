@@ -1,16 +1,20 @@
 "use client";
 
+import { useAuth } from "@/app/AuthContext";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function AddThought() {
-  const [name, setName] = useState<string>("");
   const [thought, setThought] = useState<string>("");
-
+  const { user, loading } = useAuth();
   const router = useRouter();
 
+  if (loading || user === null) {
+    return <p>Loading...</p>;
+  }
+
   async function submit() {
-    if (name === "" || thought === "") return;
+    if (thought === "") return;
     const base =
       process.env.NODE_ENV === "production" ? "" : "http://localhost:5000";
 
@@ -19,7 +23,7 @@ export default function AddThought() {
       res = await fetch(`${base}/api/thoughts`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name, thought: thought }),
+        body: JSON.stringify({ user_id: user?.id, thought: thought }), // user.id should not be null
       });
     } catch (e) {
       console.log("could not post", e);
@@ -31,7 +35,6 @@ export default function AddThought() {
       return;
     }
 
-    setName("");
     setThought("");
     if (data.ok) router.refresh();
     console.log(data);

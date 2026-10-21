@@ -56,7 +56,7 @@ export async function loginUser(req: Request, res: Response) {
   const { username, password } = req.body;
   assert(
     username && password,
-    "username and password required but not undefined. This is not a expected behaviour",
+    "username and password required but undefined. This is not a expected behaviour",
   );
   let result;
   try {

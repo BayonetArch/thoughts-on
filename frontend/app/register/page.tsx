@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { fetchData } from "../components/ThoughtsList";
+import { fetchData } from "../components/ListThoughts";
+import { useRouter } from "next/navigation";
 
 export default function Register() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [msg, setMessage] = useState("");
+  const router = useRouter();
 
   async function registerUser() {
     if (password === "" || username === "") {
@@ -28,6 +30,7 @@ export default function Register() {
       return;
     }
     setMessage("Registred!!");
+    router.replace("/login");
   }
 
   return (

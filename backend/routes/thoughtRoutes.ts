@@ -21,7 +21,7 @@ thoughtRouter.post(
   "/",
   validateBody(
     thoughtSchema,
-    "could not validate thought body. make sure name and thought fileds are present.",
+    "could not validate thought body. make sure thought and user_id field are present",
   ),
   createThoughts,
 );
