@@ -22,8 +22,9 @@ export default function AddThought() {
     try {
       res = await fetch(`${base}/api/thoughts`, {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id: user?.id, thought: thought }), // user.id should not be null
+        body: JSON.stringify({ thought: thought }),
       });
     } catch (e) {
       console.log("could not post", e);

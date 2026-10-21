@@ -5,20 +5,22 @@ import {
   createThoughts,
   deleteThoughts,
   getThoughts,
-  getThoughtsByID,
+  myThoughts,
 } from "../controllers/thoughtController";
+import requireAuth from "../middleware/requireAuth";
 
 const thoughtRouter = Router();
 
 /* GET /api/thoughts/ */
 thoughtRouter.get("/", getThoughts);
 
-/* GET /api/thoughts/:id */
-thoughtRouter.get("/:id", getThoughtsByID);
+/* GET /api/thoughts/me/ */
+thoughtRouter.get("/me/", requireAuth, myThoughts);
 
 /* POST /api/thoughts/ */
 thoughtRouter.post(
   "/",
+  requireAuth,
   validateBody(
     thoughtSchema,
     "could not validate thought body. make sure thought and user_id field are present",

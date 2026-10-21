@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import pool from "../lib/db.ts";
 import logger from "../lib/logger.ts";
 
-export async function getThoughts(req: Request, res: Response) {
+export async function getThoughts(_req: Request, res: Response) {
   let result;
   try {
     result = await pool.query("SELECT * FROM thoughts");
@@ -15,33 +15,42 @@ export async function getThoughts(req: Request, res: Response) {
   res.json({ ok: true, thoughts: result.rows });
 }
 
-export async function getThoughtsByID(req: Request, res: Response) {
-  const id = req.params.id;
+export async function myThoughts(req: Request, res: Response) {
+  const user_id = res.locals.user.id;
+
+  if (user_id === null || user_id === undefined) {
+    res.status(401).json({ ok: false, error: "Unauthorized" });
+  }
   let result;
   try {
-    result = await pool.query("SELECT * FROM thoughts WHERE id = $1", [id]);
+    result = await pool.query("SELECT * FROM thoughts WHERE user_id = $1", [
+      user_id,
+    ]);
   } catch (e) {
     logger.error("Got error while getting thoughts ", e);
     res.status(500).json({ ok: false, error: "Something went wrong" });
     return;
   }
   if (result.rows.length === 0) {
-    res
-      .status(404)
-      .json({ ok: false, error: `thought not found for the id '${id}'` });
+    res.status(404).json({
+      ok: false,
+      error: `thought not found for the id '${user_id}'`,
+    });
     return;
   }
-  logger.info(`Got thought for id '${id}'`, result.rows[0]);
-  res.json({ ok: true, thought: result.rows });
+  logger.info(`Got thought for id '${user_id}'`, result.rows[0]);
+  res.json({ ok: true, thoughts: result.rows });
 }
 
 export async function createThoughts(req: Request, res: Response) {
   const body = req.body;
+  const user_id = res.locals.user.id;
+
   let result;
   try {
     result = await pool.query(
       "INSERT INTO thoughts (user_id,thought) VALUES ($1,$2) RETURNING *",
-      [body.user_id, body.thought],
+      [user_id, body.thought],
     );
   } catch (e) {
     logger.info("Got error while creating thought\n", e);
