@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useAuth } from "../AuthContext";
 import { User } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 function RouteRegister() {
   return (
@@ -45,6 +46,7 @@ function LogoutButton() {
 
 export default function AuthButtons() {
   const { user, loading } = useAuth();
+  const router = useRouter();
   if (loading) return null;
 
   if (!loading && user === null) {
@@ -58,7 +60,12 @@ export default function AuthButtons() {
 
   return (
     <div className=" text-white font-bold flex gap-4 items-center ">
-      <div className="flex gap-2 items-center">
+      <div
+        className="flex gap-2 items-center hover:cursor-pointer hover:bg-gray-700 p-2 rounded"
+        onClick={() => {
+          router.push("/me");
+        }}
+      >
         <User /> <span>{user?.username}</span>
       </div>
       <LogoutButton />
