@@ -1,59 +1,64 @@
 "use client";
 
-import { useState } from "react";
-import { fetchData } from "../components/ListThoughts";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { fetchData } from "../components/ListThoughts";
+import AuthForm from "../components/AuthForm";
+import AuthPanel from "../components/AuthPanel";
+import type { AuthResult } from "../components/AuthForm";
 
 export default function Register() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [msg, setMessage] = useState("");
   const router = useRouter();
 
-  async function registerUser() {
-    if (password === "" || username === "") {
-      setMessage("password or username empty");
-      return;
+  async function handleRegister(
+    username: string,
+    password: string,
+  ): Promise<AuthResult> {
+    try {
+      const res = await fetchData(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: username, password: password }),
+        },
+      );
+
+      if (res === null) {
+        return { message: "Could not reach the server.", ok: false };
+      }
+
+      if (!res.ok) {
+        return { message: res.error ?? "Could not register.", ok: false };
+      }
+    } catch (error) {
+      console.log("could not register", error);
+      return { message: "Something went wrong.", ok: false };
     }
 
-    const res = await fetchData(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: username, password: password }),
-      },
-    );
-    if (!res.ok) {
-      console.error(res.error);
-      setMessage(`error: ${res.error}`);
-      return;
-    }
-    setMessage("Registred!!");
     router.replace("/login");
+    return { message: "Account created. Redirecting to sign in.", ok: true };
   }
 
   return (
-    <div className="flex flex-col gap-4 items-center">
-      <p> Message: {msg}</p>
-      <input
-        type="text"
-        placeholder="Username"
-        className="border border-gray-300 rounded-md p-2"
-        onChange={(e) => setUsername(e.target.value)}
+    <AuthPanel
+      title="Register"
+      description="Pick a username and a password to get started."
+    >
+      <AuthForm
+        submitLabel="Create account"
+        passwordAutoComplete="new-password"
+        onSubmit={handleRegister}
       />
-      <input
-        type="password"
-        placeholder="Password"
-        className="border border-gray-300 rounded-md p-2"
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        onClick={() => registerUser()}
-      >
-        Register
-      </button>
-    </div>
+      <p className="text-sm text-ink-mute">
+        Already have an account?{" "}
+        <Link
+          className="text-mint underline-offset-4 hover:underline"
+          href="/login"
+        >
+          Sign in
+        </Link>
+      </p>
+    </AuthPanel>
   );
 }

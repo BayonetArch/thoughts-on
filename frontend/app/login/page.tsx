@@ -1,62 +1,73 @@
 "use client";
-import { useState } from "react";
-import { useAuth } from "../AuthContext";
-import { useSearchParams, useRouter } from "next/navigation";
-import { getSafeRedirectPath } from "@/lib/redirect";
 
-export default function Login() {
+import { Suspense } from "react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useAuth } from "../AuthContext";
+import { getSafeRedirectPath } from "@/lib/redirect";
+import AuthForm from "../components/AuthForm";
+import AuthPanel from "../components/AuthPanel";
+import { buttonClassName } from "../components/ui/Button";
+import type { AuthResult } from "../components/AuthForm";
+
+function LoginForm() {
   const { user, loading, login } = useAuth();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [msg, setMessage] = useState("");
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  if (!loading && user !== null) {
-    return <div>Already logged in as {user.username}</div>;
-  }
-
-  async function loginUser() {
-    if (password === "" || username === "") {
-      setMessage("password or username empty");
-      return;
-    }
-
+  async function handleLogin(
+    username: string,
+    password: string,
+  ): Promise<AuthResult> {
     try {
       await login(username, password);
-      setMessage("Logged In");
-      // make sure we are not immune against the url redirect attacks to malicious urls
       const safeRedirectPath = getSafeRedirectPath(searchParams.get("next"));
       router.push(safeRedirectPath);
+      return { message: "Signed in.", ok: true };
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : "Something went wrong";
-      console.error(errorMessage);
-      setMessage(`error: ${errorMessage}`);
+        error instanceof Error ? error.message : "Something went wrong.";
+      return { message: errorMessage, ok: false };
     }
+  }
+
+  if (loading) {
+    return <p className="text-sm text-ink-mute">Checking your session...</p>;
+  }
+
+  if (user !== null) {
+    return (
+      <AuthPanel
+        title="Already signed in"
+        description={`You are signed in as ${user.username}.`}
+      >
+        <Link className={buttonClassName("secondary")} href="/">
+          Go to the feed
+        </Link>
+      </AuthPanel>
+    );
   }
 
   return (
-    <div className="flex flex-col gap-4 items-center">
-      <p> Message: {msg}</p>
-      <input
-        type="text"
-        placeholder="Username"
-        className="border border-gray-300 rounded-md p-2"
-        onChange={(e) => setUsername(e.target.value)}
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        className="border border-gray-300 rounded-md p-2"
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        onClick={() => loginUser()}
-      >
-        Login
-      </button>
-    </div>
+    <AuthPanel title="Sign in" description="Use your username and password.">
+      <AuthForm submitLabel="Sign in" onSubmit={handleLogin} />
+      <p className="text-sm text-ink-mute">
+        Need an account?{" "}
+        <Link
+          className="text-mint underline-offset-4 hover:underline"
+          href="/register"
+        >
+          Register
+        </Link>
+      </p>
+    </AuthPanel>
+  );
+}
+
+export default function Login() {
+  return (
+    <Suspense fallback={<p className="text-sm text-ink-mute">Loading...</p>}>
+      <LoginForm />
+    </Suspense>
   );
 }

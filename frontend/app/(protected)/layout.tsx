@@ -12,6 +12,7 @@ export default function ProtectedLayout({
   const router = useRouter();
   const { user, loading } = useAuth();
   const pathname = usePathname();
+
   useEffect(() => {
     if (!loading && user === null) {
       router.replace(`/login?next=${encodeURIComponent(pathname)}`);
@@ -19,7 +20,7 @@ export default function ProtectedLayout({
   }, [loading, user, router, pathname]);
 
   if (loading || user === null) {
-    return <p>Loading...</p>;
+    return <p className="text-sm text-ink-mute">Checking your session...</p>;
   }
 
   return <div>{children}</div>;

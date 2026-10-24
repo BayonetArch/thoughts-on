@@ -1,27 +1,28 @@
 import Link from "next/link";
 import AuthButtons from "./AuthButtons";
-
-function RouteAddThoughts() {
-  return (
-    <div>
-      <Link
-        className="bg-green-200 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        href="/add-thoughts"
-      >
-        Add Thoughts
-      </Link>
-    </div>
-  );
-}
+import { buttonClassName } from "./ui/Button";
 
 export default function NavBar() {
   return (
-    <nav className="p-4 flex gap-4 items-center justify-end">
-      <Link className="text-lg" href="/">
-        Home
-      </Link>
-      <AuthButtons />
-      <RouteAddThoughts />
-    </nav>
+    <header className="sticky top-0 z-10 border-b border-line bg-bg/90 backdrop-blur">
+      <nav className="mx-auto flex w-full max-w-3xl flex-wrap items-center gap-x-4 gap-y-2 px-5 py-4 md:px-8">
+        <Link
+          className="mr-auto font-mono text-sm tracking-tight text-mint"
+          href="/"
+        >
+          thoughts on
+        </Link>
+        <Link
+          className="text-sm text-ink-dim transition-colors hover:text-mint"
+          href="/"
+        >
+          Home
+        </Link>
+        <AuthButtons />
+        <Link className={buttonClassName("primary")} href="/add-thoughts">
+          Add thoughts
+        </Link>
+      </nav>
+    </header>
   );
 }

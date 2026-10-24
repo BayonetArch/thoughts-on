@@ -1,8 +1,11 @@
 "use client";
-import { User } from "lucide-react";
-import { useEffect, useState } from "react";
 
-type thoughtObject = {
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import ThoughtCard from "./ThoughtCard";
+import StateMessage from "./ui/StateMessage";
+
+type Thought = {
   id: string;
   user_id: string;
   thought: string;
@@ -13,7 +16,6 @@ export async function fetchData(url: string, opts?: RequestInit) {
   try {
     res = await fetch(url, { method: "GET", ...opts });
   } catch (e) {
-    // (digest: HANGING_PROMISE_REJECTION). That is expected, not an error during production.
     if ((e as { digest?: string })?.digest !== "HANGING_PROMISE_REJECTION") {
       console.error("could not fetch", e);
     }
@@ -24,33 +26,11 @@ export async function fetchData(url: string, opts?: RequestInit) {
   return res.json();
 }
 
-function Thoughts({
-  name: userName,
-  thought,
-}: {
-  name: string;
-  thought: string;
-}) {
-  return (
-    <div className="flex flex-col gap-4  rounded-xl p-6  relative bg-mauve-900 justify-center">
-      <p className="flex gap-2 bold text-xl md:text-2xl items-center text-gray-400 min-w-0">
-        <User className="shrink-0 stroke-green-200 " />
-        <span className="min-w-0 wrap-break-word">{userName}</span>
-      </p>
-      <p className="flex gap-2 bold text-xl text-gray-800 min-w-0 ">
-        <span className="shrink-0">{">>"}</span>{" "}
-        <span className="italic text-lg text-[white]/65 min-w-0 wrap-break-word">
-          {thought}
-        </span>
-      </p>
-    </div>
-  );
-}
-
 export default function ListThoughts() {
-  const [thoughts, setThoughts] = useState<thoughtObject[] | null>(null);
+  const [thoughts, setThoughts] = useState<Thought[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrMsg] = useState<string | null>(null);
+
   useEffect(() => {
     async function loadThoughts() {
       const base =
@@ -65,26 +45,45 @@ export default function ListThoughts() {
       }
       setThoughts(res?.thoughts);
     }
+
     loadThoughts();
   }, []);
 
-  if (!loading && thoughts === null) {
-    return <p>Internal server error while getting thoughts: {errorMsg}</p>;
+  if (loading) {
+    return <StateMessage>Loading thoughts.</StateMessage>;
   }
 
-  if (loading || thoughts === null) {
-    return <p>Loading...</p>;
+  if (thoughts === null) {
+    return (
+      <StateMessage tone="error">
+        Could not load thoughts. {errorMsg}
+      </StateMessage>
+    );
+  }
+
+  if (thoughts.length === 0) {
+    return (
+      <div className="flex flex-col items-start gap-3 rounded-lg border border-line bg-surface p-6">
+        <p className="text-ink-dim">No thoughts yet.</p>
+        <Link
+          className="text-sm text-mint underline-offset-4 hover:underline"
+          href="/add-thoughts"
+        >
+          Write the first one
+        </Link>
+      </div>
+    );
   }
 
   return (
-    <div className="flex flex-col gap-4 md:gap-6">
-      {!thoughts || thoughts.length === 0 ? (
-        <div>thoughts not found.</div>
-      ) : (
-        thoughts.map((obj) => (
-          <Thoughts key={obj.id} name={obj.user_id} thought={obj.thought} />
-        ))
-      )}
+    <div className="flex flex-col gap-4">
+      {thoughts.map((thought) => (
+        <ThoughtCard
+          key={thought.id}
+          author={thought.user_id}
+          thought={thought.thought}
+        />
+      ))}
     </div>
   );
 }

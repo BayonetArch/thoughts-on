@@ -63,3 +63,34 @@ but `GET /api/auth/me` returns:
 
 The frontend currently accepts both (`data.user ?? data.loggedIn`), but one
 consistent shape (preferably `user`) would be safer.
+
+## 5. Thoughts return the author username
+
+**File:** `backend/controllers/thoughtController.ts`
+
+`GET /api/thoughts` and `GET /api/thoughts/me` return `user_id` only. The feed
+and the profile page therefore show a raw UUID where the author name belongs.
+The frontend cannot resolve the name with the current endpoints.
+
+**Needed:** join `thoughts` with the users table and add `username` to each
+thought row, keeping the existing fields.
+
+Expected shape:
+
+```json
+{
+  "ok": true,
+  "thoughts": [
+    {
+      "id": "1",
+      "user_id": "eb1c1b23-54f2-46a0-a327-d85a6f7e399b",
+      "username": "sudip",
+      "thought": "Hello world?",
+      "created_at": "2026-10-24T08:12:00.000Z"
+    }
+  ]
+}
+```
+
+The frontend will switch the card header from `user_id` to `username`.
+
