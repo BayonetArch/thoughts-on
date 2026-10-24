@@ -5,8 +5,9 @@ const nextConfig: NextConfig = {
   experimental: {
     agentFeedback: true,
   },
-  cacheComponents: true,
-  partialPrefetching: true,
+  // DO SOMETHING
+  cacheComponents: false,
+  partialPrefetching: false,
   turbopack: {
     rules: {
       "*.css": {
@@ -15,6 +16,14 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  // async rewrites() {
+  //   return [
+  //     {
+  //       source: "/api/(.*)",
+  //       destination: "http://localhost:3001/api/$1",
+  //     },
+  //   ];
+  // },
 };
 
 export default nextConfig;

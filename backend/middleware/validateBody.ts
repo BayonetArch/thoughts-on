@@ -1,20 +1,21 @@
 import type { NextFunction, Request, Response } from "express";
 import { z } from "zod";
+import logger from "../lib/logger";
 
-export default function validateBody(schema: z.ZodType) {
+export default function validateBody(schema: z.ZodType, errorMessage: string) {
   return (req: Request, res: Response, next: NextFunction) => {
     const result = schema.safeParse(req.body);
 
     if (!result.success) {
       res.status(400).json({
-        error: `Validation failed: make sure that name and comment field are present`,
+        error: errorMessage,
         issues: result.error.issues.map((i) => ({
           field: i.path.join(""),
           message: i.message,
         })),
       });
-      console.log(result, req.body);
-      console.error("Could not validate the request Body\n", result.error);
+      logger.info(result, req.body);
+      logger.error("Could not validate the request Body\n", result.error);
       return;
     }
 
