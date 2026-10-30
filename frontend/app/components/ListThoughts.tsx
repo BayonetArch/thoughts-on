@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import api from "@/lib/api";
 import ThoughtCard from "./ThoughtCard";
 import StateMessage from "./ui/StateMessage";
 
@@ -11,20 +12,10 @@ type Thought = {
   thought: string;
 };
 
-export async function fetchData(url: string, opts?: RequestInit) {
-  let res;
-  try {
-    res = await fetch(url, { method: "GET", ...opts });
-  } catch (e) {
-    if ((e as { digest?: string })?.digest !== "HANGING_PROMISE_REJECTION") {
-      console.error("could not fetch", e);
-    }
-    return null;
-  }
-
-  if (!res) return null;
-  return res.json();
-}
+type ThoughtsResponse = {
+  thoughts?: Thought[];
+  error?: string;
+};
 
 export default function ListThoughts() {
   const [thoughts, setThoughts] = useState<Thought[] | null>(null);
@@ -33,17 +24,20 @@ export default function ListThoughts() {
 
   useEffect(() => {
     async function loadThoughts() {
-      const base =
-        process.env.NEXT_PUBLIC_API_URL ?? "https://thoughts-on.vercel.app";
-      const res = await fetchData(`${base}/api/thoughts`, {
-        cache: "no-store",
-      });
-      setLoading(false);
-      if (res?.error) {
-        setErrMsg(res.error);
-        return;
+      try {
+        const res = await api("/api/thoughts", { cache: "no-store" });
+        const data: ThoughtsResponse = await res.json();
+        if (data.error) {
+          setErrMsg(data.error);
+          return;
+        }
+        setThoughts(data.thoughts ?? []);
+      } catch (error) {
+        console.error("could not load thoughts", error);
+        setErrMsg("Could not reach the server.");
+      } finally {
+        setLoading(false);
       }
-      setThoughts(res?.thoughts);
     }
 
     loadThoughts();

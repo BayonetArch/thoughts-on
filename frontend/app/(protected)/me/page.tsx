@@ -28,7 +28,12 @@ export default function Me() {
       const res = await api(`/api/thoughts/me`, {
         credentials: "include",
       });
+      if (!res.ok) {
+        setMyThoughts([]);
+        return;
+      }
       const json = await res.json();
+
       setMyThoughts(json.thoughts);
     }
 

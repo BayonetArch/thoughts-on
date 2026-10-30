@@ -10,9 +10,9 @@ export function getCurrentUser(_req: Request, res: Response) {
 }
 
 export async function registerUser(req: Request, res: Response) {
-  const { username, pass } = req.body;
+  const { username, password } = req.body;
 
-  const passwordHash = await Bun.password.hash(pass, {
+  const passwordHash = await Bun.password.hash(password, {
     algorithm: "bcrypt",
     cost: 12,
   });

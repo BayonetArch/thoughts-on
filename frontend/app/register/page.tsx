@@ -2,10 +2,14 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { fetchData } from "../components/ListThoughts";
+import api from "@/lib/api";
 import AuthForm from "../components/AuthForm";
 import AuthPanel from "../components/AuthPanel";
 import type { AuthResult } from "../components/AuthForm";
+
+type RegisterResponse = {
+  error?: string;
+};
 
 export default function Register() {
   const router = useRouter();
@@ -15,21 +19,16 @@ export default function Register() {
     password: string,
   ): Promise<AuthResult> {
     try {
-      const res = await fetchData(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username: username, password: password }),
-        },
-      );
+      const res = await api("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: username, password: password }),
+      });
 
-      if (res === null) {
-        return { message: "Could not reach the server.", ok: false };
-      }
+      const data: RegisterResponse = await res.json();
 
       if (!res.ok) {
-        return { message: res.error ?? "Could not register.", ok: false };
+        return { message: data.error ?? "Could not register.", ok: false };
       }
     } catch (error) {
       console.log("could not register", error);

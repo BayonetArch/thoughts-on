@@ -17,6 +17,7 @@ export default async function Home() {
           Short notes posted by people using the app.
         </p>
       </header>
+
       <Suspense fallback={<StateMessage>Loading thoughts.</StateMessage>}>
         <ListThoughts />
       </Suspense>
