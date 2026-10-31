@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { fetchData } from "../components/ListThoughts";
 import { useRouter } from "next/navigation";
+import api from "@/lib/api";
 
 export default function Register() {
   const [username, setUsername] = useState("");
@@ -16,19 +16,18 @@ export default function Register() {
       return;
     }
 
-    const res = await fetchData(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: username, password: password }),
-      },
-    );
-    if (!res.ok) {
-      console.error(res.error);
-      setMessage(`error: ${res.error}`);
+    const res = await api(`/api/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: username, password: password }),
+    });
+
+    const data = await res.json();
+    if (!res.ok || data.error) {
+      setMessage(`Could not register user: ${data.error}`);
       return;
     }
+
     setMessage("Registred!!");
     router.replace("/login");
   }

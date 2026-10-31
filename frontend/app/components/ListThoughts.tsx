@@ -1,4 +1,5 @@
 "use client";
+import api from "@/lib/api";
 import { User } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -7,22 +8,6 @@ type thoughtObject = {
   user_id: string;
   thought: string;
 };
-
-export async function fetchData(url: string, opts?: RequestInit) {
-  let res;
-  try {
-    res = await fetch(url, { method: "GET", ...opts });
-  } catch (e) {
-    // (digest: HANGING_PROMISE_REJECTION). That is expected, not an error during production.
-    if ((e as { digest?: string })?.digest !== "HANGING_PROMISE_REJECTION") {
-      console.error("could not fetch", e);
-    }
-    return null;
-  }
-
-  if (!res) return null;
-  return res.json();
-}
 
 function Thoughts({
   name: userName,
@@ -53,17 +38,25 @@ export default function ListThoughts() {
   const [errorMsg, setErrMsg] = useState<string | null>(null);
   useEffect(() => {
     async function loadThoughts() {
-      const base =
-        process.env.NEXT_PUBLIC_API_URL ?? "https://thoughts-on.vercel.app";
-      const res = await fetchData(`${base}/api/thoughts`, {
+      const res = await api("/api/thoughts", {
         cache: "no-store",
       });
-      setLoading(false);
-      if (res?.error) {
-        setErrMsg(res.error);
+
+      if (!res.ok) {
+        setThoughts([]);
+        setLoading(false);
         return;
       }
-      setThoughts(res?.thoughts);
+
+      const data = await res.json();
+      if (data.error) {
+        setErrMsg(data.error);
+        setLoading(false);
+        return;
+      }
+
+      setThoughts(data.thoughts);
+      setLoading(false);
     }
     loadThoughts();
   }, []);
