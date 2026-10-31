@@ -25,6 +25,7 @@ export default function Login() {
     try {
       await login(username, password);
       setMessage("Logged In");
+
       // make sure we are not immune against the url redirect attacks to malicious urls
       const safeRedirectPath = getSafeRedirectPath(searchParams.get("next"));
       router.push(safeRedirectPath);
@@ -32,6 +33,7 @@ export default function Login() {
       const errorMessage =
         error instanceof Error ? error.message : "Something went wrong";
       console.error(errorMessage);
+
       setMessage(`error: ${errorMessage}`);
     }
   }
