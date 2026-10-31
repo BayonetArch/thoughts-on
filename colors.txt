@@ -1,0 +1,6 @@
+- https://colorhunt.co/palette/f33535d8e9f033425b29252c
+
+bg    - hsl(274, 8%, 15%)
+text  - hsl(197, 44%, 89%)
+accent - hsl(217, 28%, 27%)
+links - hsl(0, 88%, 58%)
