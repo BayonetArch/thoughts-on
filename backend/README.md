@@ -1,15 +1,3 @@
-# routes
+# Improve the ui 
 
-To install dependencies:
-
-```bash
-bun install
-```
-
-To run:
-
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.4.2. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+Try to code the ui by hand instead of the generic AI generated ui.  
