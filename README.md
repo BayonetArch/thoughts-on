@@ -1,4 +1,5 @@
 # Thoughts-on
 
-A website to share and discuss ideas, thoughts, and other things.
-Made while learning backend.
+A full-stack app that allows users to share their thoughts with other users.
+
+The app uses Next.js for frontend, Express.js for backend and PostgreSQL for database.
