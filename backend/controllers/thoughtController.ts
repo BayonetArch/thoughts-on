@@ -2,22 +2,22 @@ import type { Request, Response } from "express";
 import pool from "../lib/db.ts";
 import logger from "../lib/logger.ts";
 
+const THOUGHT_QUERY = `SELECT user_id,username,thoughts.id,thoughts.thought,thoughts.created_at
+      FROM thoughts
+      JOIN users
+      ON thoughts.user_id = users.id`;
+
 export async function getThoughts(_req: Request, res: Response) {
   let result;
   try {
-    result = await pool.query(
-      `SELECT user_id,username,thoughts.id,thoughts.thought,thoughts.created_at
-      FROM thoughts
-      JOIN users
-      ON thoughts.user_id = users.id;`,
-    );
+    result = await pool.query(THOUGHT_QUERY);
   } catch (e) {
     logger.error("Got error while getting thoughts: ", e);
     res.status(500).json({ ok: false, error: "Something went wrong" });
     return;
   }
 
-  logger.info("SENT: ", result.rows);
+  logger.info("SENT", result.rowCount, "thoughts.");
 
   res.json({ ok: true, thoughts: result.rows });
 }
@@ -31,16 +31,14 @@ export async function myThoughts(_req: Request, res: Response) {
 
   let result;
   try {
-    result = await pool.query(`SELECT * FROM thoughts WHERE user_id = $1`, [
-      user_id,
-    ]);
+    result = await pool.query(`${THOUGHT_QUERY} WHERE user_id = $1`, [user_id]);
   } catch (e) {
     logger.error("Got error while getting thoughts ", e);
     res.status(500).json({ ok: false, error: "Something went wrong" });
     return;
   }
 
-  logger.info(`Got thought for id '${user_id}'`, result.rows[0]);
+  logger.info(`SENT`, result.rowCount, `thoughts for user ${user_id}`);
   res.json({ ok: true, thoughts: result.rows });
 }
 
