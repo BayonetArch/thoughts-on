@@ -31,6 +31,8 @@ export async function myThoughts(req: Request, res: Response) {
     res.status(500).json({ ok: false, error: "Something went wrong" });
     return;
   }
+
+  // TODO: donot error out here
   if (result.rows.length === 0) {
     res.status(404).json({
       ok: false,
@@ -62,9 +64,14 @@ export async function createThoughts(req: Request, res: Response) {
 }
 
 // export function updatethoughts(req: Request, res: Response) {}
-
 export async function deleteThoughts(req: Request, res: Response) {
+  const user_id = res.locals.user.id;
   const id = req.params.id;
+
+  if (user_id === null || user_id === undefined) {
+
+  }
+
   let result;
   try {
     result = await pool.query("DELETE FROM thoughts WHERE id = $1", [id]);
@@ -81,6 +88,7 @@ export async function deleteThoughts(req: Request, res: Response) {
   }
 
   res.json({ ok: true, deleted: { id: id } });
+
   logger.info("Delete affected", result.rowCount, "rows");
   logger.info("Deleted ID", id);
 }

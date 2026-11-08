@@ -10,6 +10,7 @@ export default async function requireAuth(
   if (!token) {
     return res.status(401).json({ ok: false, error: "not logged in" });
   }
+
   const user = await getUserBySessionToken(token);
   if (!user) {
     return res.status(401).json({ ok: false, error: "session expired" });

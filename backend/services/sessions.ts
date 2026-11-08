@@ -32,9 +32,11 @@ export async function getUserBySessionToken(token: string) {
      WHERE sessions.token_hash = $1 AND sessions.expires_at > now()`,
     [hashToken(token)],
   );
+
   if (result.rows.length === 0) {
     return null;
   }
+
   return result.rows[0];
 }
 

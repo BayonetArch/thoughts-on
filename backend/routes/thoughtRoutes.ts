@@ -28,6 +28,6 @@ thoughtRouter.post(
   createThoughts,
 );
 
-thoughtRouter.delete("/:id", deleteThoughts);
+thoughtRouter.delete("/:id",requireAuth, deleteThoughts);
 
 export default thoughtRouter;
