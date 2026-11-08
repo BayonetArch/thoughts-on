@@ -30,6 +30,7 @@ export async function registerUser(req: Request, res: Response) {
 
     if (e instanceof PG.DatabaseError && e.code === "23505") {
       logger.error("Error registering user: username already exists", e.detail);
+
       return res.status(409).json({
         ok: false,
         error: "Username already exists",
@@ -46,6 +47,7 @@ export async function registerUser(req: Request, res: Response) {
     logger.error("Could not register user", result);
     return res.status(500).json({ ok: false, error: "Something went wrong" });
   }
+
   const user = result.rows[0];
 
   logger.info("Registered user: ", username, "with id:", user.id);
