@@ -6,8 +6,11 @@ import {
   deleteThoughts,
   getThoughts,
   myThoughts,
+  updatethoughts,
 } from "../controllers/thoughtController";
 import requireAuth from "../middleware/requireAuth";
+import thoughtUpdateSchema from "../schemas/thoughtUpdateSchema";
+import validateId from "../middleware/validateId";
 
 const thoughtRouter = Router();
 
@@ -28,6 +31,13 @@ thoughtRouter.post(
   createThoughts,
 );
 
-thoughtRouter.delete("/:id", requireAuth, deleteThoughts);
+thoughtRouter.patch(
+  "/:id",
+  requireAuth,
+  validateId,
+  validateBody(thoughtUpdateSchema, "Could not update the thoughts"),
+  updatethoughts,
+);
+thoughtRouter.delete("/:id", requireAuth, validateId, deleteThoughts);
 
 export default thoughtRouter;

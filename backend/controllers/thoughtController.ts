@@ -26,12 +26,12 @@ export async function myThoughts(_req: Request, res: Response) {
   const user_id = res.locals.user.id;
 
   if (user_id === null || user_id === undefined) {
-    res.status(401).json({ ok: false, error: "Unauthorized" });
+    return res.status(401).json({ ok: false, error: "Unauthorized" });
   }
 
   let result;
   try {
-    result = await pool.query("SELECT * FROM thoughts WHERE user_id = $1", [
+    result = await pool.query(`SELECT * FROM thoughts WHERE user_id = $1`, [
       user_id,
     ]);
   } catch (e) {
@@ -49,13 +49,13 @@ export async function createThoughts(req: Request, res: Response) {
   const user_id = res.locals.user.id;
 
   if (user_id === null || user_id === undefined) {
-    res.status(401).json({ ok: false, error: "Unauthorized" });
+    return res.status(401).json({ ok: false, error: "Unauthorized" });
   }
 
   let result;
   try {
     result = await pool.query(
-      "INSERT INTO thoughts (user_id,thought) VALUES ($1,$2) RETURNING *",
+      `INSERT INTO thoughts (user_id,thought) VALUES ($1,$2) RETURNING *`,
       [user_id, body.thought],
     );
   } catch (e) {
@@ -64,10 +64,37 @@ export async function createThoughts(req: Request, res: Response) {
   }
 
   logger.info("Created thought", result.rows[0]);
-  res.json({ ok: true, created: { thought: result.rows[0] } });
+  res.json({ ok: true, thought: result.rows[0] });
 }
 
-// export function updatethoughts(req: Request, res: Response) {}
+export async function updatethoughts(req: Request, res: Response) {
+  const id = req.params.id;
+  const body = req.body;
+  const user_id = res.locals.user.id;
+
+  if (user_id === null || user_id === undefined) {
+    return res.status(401).json({ ok: false, error: "Unauthorized" });
+  }
+
+  let result;
+  try {
+    result = await pool.query(
+      `UPDATE thoughts SET thought = $1 WHERE user_id = $2 and id = $3 RETURNING id,thought`,
+      [body.thought, user_id, id],
+    );
+  } catch (e) {
+    logger.error("Got error while updating the thought\n", e);
+    return res.status(404).json({ ok: false, error: "thought not found" });
+  }
+
+  if (result.rowCount === 0) {
+    return res.status(404).json({ ok: false, error: "thought not found" });
+  }
+
+  logger.info("UPDATE affected", result.rowCount, "rows");
+  return res.json({ ok: true, thought: result.rows[0] });
+}
+
 export async function deleteThoughts(req: Request, res: Response) {
   const user_id = res.locals.user.id;
   const id = req.params.id;
@@ -79,12 +106,12 @@ export async function deleteThoughts(req: Request, res: Response) {
   let result;
   try {
     result = await pool.query(
-      "DELETE FROM thoughts WHERE user_id = $1 and id = $2",
+      `DELETE FROM thoughts WHERE user_id = $1 and id = $2`,
       [user_id, id],
     );
   } catch (e) {
     logger.error("Got error while deleting the thought\n", e);
-    return res.status(404).json({ ok: false, error: "thought not found" });
+    return res.status(500).json({ ok: false, error: "internal error" });
   }
 
   if (result.rowCount === 0) {
