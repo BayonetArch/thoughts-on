@@ -5,7 +5,12 @@ import logger from "../lib/logger.ts";
 export async function getThoughts(_req: Request, res: Response) {
   let result;
   try {
-    result = await pool.query("SELECT * FROM thoughts");
+    result = await pool.query(
+      `SELECT user_id,username,thoughts.id,thoughts.thought,thoughts.created_at
+      FROM thoughts
+      JOIN users
+      ON thoughts.user_id = users.id;`,
+    );
   } catch (e) {
     logger.error("Got error while getting thoughts: ", e);
     res.status(500).json({ ok: false, error: "Something went wrong" });

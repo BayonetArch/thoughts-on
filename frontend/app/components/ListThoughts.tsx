@@ -5,16 +5,20 @@ import { useEffect, useState } from "react";
 
 type thoughtObject = {
   id: string;
+  username: string;
+  created_at: string;
   user_id: string;
   thought: string;
 };
 
 function Thoughts({
-  name: userName,
+  userName,
   thought,
+  createdAt,
 }: {
-  name: string;
+  userName: string;
   thought: string;
+  createdAt: string;
 }) {
   return (
     <div className="flex flex-col gap-4  rounded-xl p-6  relative bg-mauve-900 justify-center">
@@ -26,6 +30,9 @@ function Thoughts({
         <span className="shrink-0">{">>"}</span>{" "}
         <span className="italic text-lg text-[white]/65 min-w-0 wrap-break-word">
           {thought}
+        </span>
+        <span className="italic text-lg text-[white]/65 min-w-0 wrap-break-word">
+          {createdAt}
         </span>
       </p>
     </div>
@@ -75,7 +82,12 @@ export default function ListThoughts() {
         <div>thoughts not found.</div>
       ) : (
         thoughts.map((obj) => (
-          <Thoughts key={obj.id} name={obj.user_id} thought={obj.thought} />
+          <Thoughts
+            key={obj.id}
+            userName={obj.username}
+            thought={obj.thought}
+            createdAt={obj.created_at}
+          />
         ))
       )}
     </div>
